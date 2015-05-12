@@ -1,0 +1,12 @@
+{application, lager_kafka_backend, [
+        {description, "Lager Kafka Logging Backend"},
+        {vsn, "1.0.0"},
+        {registered, []},
+        {applications, [
+                kernel,
+                stdlib,
+                lager,
+                ekaf
+        ]},
+        {env, []}
+]}.
