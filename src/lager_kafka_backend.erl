@@ -34,6 +34,7 @@
 -define(DEFAULT_FORMATTER_CONFIG, []).
 
 -record(state, {
+    id               :: tuple(),
     level            :: integer(),
     topic            :: binary(),
     method           :: atom(),
@@ -70,6 +71,7 @@ init(Params) ->
     ekaf:prepare(Topic),
 
     {ok, #state{
+        id               = {?MODULE, Topic},
         level            = lager_util:level_to_num(Level),
         topic            = Topic,
         method           = Method,
@@ -90,8 +92,8 @@ handle_call(get_loglevel, #state{ level = Level } = State) ->
 handle_call(_Request, State) ->
     {ok, ok, State}.
 
-handle_event({log, Message}, #state{ level = L, formatter = Formatter, formatter_config = FormatConfig } = State) ->
-    case lager_util:is_loggable(Message, L, ?MODULE) of
+handle_event({log, Message}, #state{ id = Id, level = L, formatter = Formatter, formatter_config = FormatConfig } = State) ->
+    case lager_util:is_loggable(Message, L, Id) of
         true ->
             log(Formatter:format(Message, FormatConfig), State),
             {ok, State};
