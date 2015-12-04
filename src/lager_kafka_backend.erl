@@ -25,7 +25,8 @@
     handle_info/2,
     terminate/2,
     code_change/3,
-    test/0
+    test/0,
+    test_batch/1
 ]).
 
 -define(DEFAULT_BROKER,           {"localhost", 9092}).
@@ -147,26 +148,35 @@ parse_level(Level) ->
 %% Test
 %% ===================================================================
 
-test() ->
+init_ekaf() ->
     application:set_env(lager, handlers, [
         {lager_console_backend, debug},
         {lager_kafka_backend, [
-                {level,                      info},
-                {topic,                      <<"test">>},
-                {broker,                     {"localhost", 9092}},
-                {send_method,                async},
-                {formatter,                  ?DEFAULT_FORMATTER},
-                {formatter_config,           [date, " ", time, " ", message]},
-                {ekaf_partition_strategy,    random},
-                {ekaf_per_partition_workers, 5}
+                {level,                         info},
+                {topic,                         <<"test">>},
+                {broker,                        {"localhost", 9092}},
+                {send_method,                   async},
+                {formatter,                     ?DEFAULT_FORMATTER},
+                {formatter_config,              [date, " ", time, " ", message]},
+                {ekaf_partition_strategy,       random},
+                {ekaf_per_partition_workers,    5},
+                {ekaf_max_downtime_buffer_size, 5}
             ]
         }
       ]),
     application:set_env(lager, error_logger_redirect, false),
 
     {ok, _} = application:ensure_all_started(ekaf),
-    {ok, _} = application:ensure_all_started(lager),
+    {ok, _} = application:ensure_all_started(lager).
+
+test() ->
+    init_ekaf(),
 
     lager:log(info,  self(), "Test INFO message"),
     lager:log(debug, self(), "Test DEBUG message"),
     lager:log(error, self(), "Test ERROR message").
+
+test_batch(N) ->
+    init_ekaf(),
+
+    [begin lager:log(info,  self(), "[~B] Test INFO message", [I]), timer:sleep(500) end || I <- lists:seq(1, N)].
