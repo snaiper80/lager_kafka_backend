@@ -11,7 +11,7 @@ This is a backend for the Lager Erlang logging framework.
 
 Include this backend into your project using rebar:
 
-    {lager_kafka_backend, ".*", {git, "https://github.com/snaiper80/lager_kafka_backend.git", {tag, "1.1"}}}
+    {lager_kafka_backend, ".*", {git, "https://github.com/snaiper80/lager_kafka_backend.git", {tag, "1.2"}}}
 
 ### Configuration
 
